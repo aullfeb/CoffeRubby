@@ -57,20 +57,35 @@
       <!-- search form end -->
 
 
-      <!-- shopping bag -->
-      <div class="shopping-bag">
+      <!-- shopping bag -->      
+        <div class="shopping-bag">
         <template x-for="(item, index) in $store.bag.items" :key="index">
         <div class="bag-item">
-          <img src="'img/products/' + item.img" :alt="item.name" />
+          <img :src="'img/products/' + item.img" :alt="item.name" />
           <div class="bag-item-detail">
             <h3 x-text="item.name"></h3>
             <div class="bag-item-price">
-              <span>Rp 50.000</span>&times; <button id="remove">&minus;</button><span>1</span>
-              <button id="add">&plus;</button>&equals; <span>Rp 50.000</span>
+              <span x-text="rupiah(item.price)"></span>&times; 
+              <button @click="$store.bag.remove(item)">&minus;</button>
+              <span x-text="item.quantity"></span>
+              <button @click="$store.bag.add(item)">&plus;</button>&equals;
+              <span x-text="rupiah(item.total)"></span>
             </div>
           </div>
         </div>
       </template>
+      <h4 x-show="$store.bag.items" style="margin-top: 1rem; margin-bottom: 1rem; text-align: right;">Total : <span x-text="rupiah($store.bag.total)"></span></h4>
+
+      <div class="form-container" x-show="$store.bag.items.length">
+        <form action="" id="checkoutform">
+          <h5>Customer Detail</h5>
+          <input type="text" placeholder="Your Name" required />
+          <input type="number" placeholder="Phone Number" required autocomplete="off"/>
+          <input type="email" placeholder="Email" required />
+          <input type="text" placeholder="Address" required />
+          <button type="submit">Checkout</button>
+        </form>
+      </div>
       </div>
       <!-- shopping bag end -->
 
@@ -193,8 +208,10 @@
            <h3 x-text="item.name"></h3>
             <!-- <p>A type of coffee bean known for its strong flavor and higher caffeine content.</p> -->
           </div>      
-          <div class="product-price" x-text="rupiah(item.price)">
-            <span x-text="rupiah(item.discount)"></span></div>
+          <div class="product-price">
+            <span x-text="rupiah(item.discount)"></span>
+            <del x-text="rupiah(item.price)"></del>
+          </div>
           <div class="product-icons">
             <a href="#" @click.prevent="$store.bag.add(item)">
               <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"
@@ -203,12 +220,14 @@
                 <use href="img/feather-sprite.svg#shopping-bag" />
               </svg>
             </a>
-            <a href="#" class="item-detail-button">
-              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round">
-                <use href="img/feather-sprite.svg#eye"/>
-              </svg></a>
+            <div class="item-detail-button">
+              <a href="#" >
+                  <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round">
+                    <use href="img/feather-sprite.svg#eye"/>
+                  </svg></a>
+            </div>
           </div>         
         </div>
       </template>

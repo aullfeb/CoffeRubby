@@ -18,47 +18,80 @@ document.addEventListener("alpine:init", () => {
       {
         id: 3,
         name: "Arabica Beans",
-        price: 30000,
-        discount:89000,
+        price: 89000,
+        discount:30000,
         img: "beans3.jpg",
       },
       {
         id: 4,
-        name: "Arabica Beans",
-        price: 30000,
-        discount:89000,
+        name: "Lampung Beans",
+        price: 70000,
+        discount:32000,
         img: "beans4.jpg",
       },
       {
         id: 5,
-        name: "Arabica Beans",
-        price: 30000,
+        name: "Italian Beans",
+        price: 120000,
         discount:90000,
         img: "beans5.jpg",
       },
     ],
   }));
 
-  Alpine.store("bag", () => ({
+  Alpine.store("bag", ({
     items: [],
     total: 0,
     quantity: 0,
     add(newItem) {
-      this.items.push(newItem);
-      this.quantity++;
-      this.total += newItem.price;
-      console.log(this.total);
+      // Cek apakah item sudah ada di keranjang
+      const bagItem = this.items.find(item => item.id === newItem.id);
+
+      //jika item belum ada/bag masih kosong
+      if (!bagItem) {
+        this.items.push({...newItem, quantity: 1, total: newItem.price});
+        this.quantity++;
+        this.total += newItem.price;
+      } else {
+        // Jika item sudah ada, cek apakah barang beda atau sama dengan yang ada di shopbag
+        this.items = this.items.map(item => {
+          //jika item beda
+          if (item.id !== newItem.id) {
+            return item;
+          } else {
+            //jika item sama, tambah kuantitas dan total
+            item.quantity++; 
+            item.total = item.price * item.quantity;
+            this.quantity++;
+            this.total += item.price;
+            return item;
+          }
+        });
+      }
+    },
+    remove(itemToRemove) {
+      const bagItem = this.items.find(item => item.id === itemToRemove.id);
+      if (bagItem) {
+        if (bagItem.quantity > 1) {
+          bagItem.quantity--;
+          bagItem.total = bagItem.price * bagItem.quantity;
+          this.quantity--;
+          this.total -= bagItem.price;
+        } else {
+          this.items = this.items.filter(item => item.id !== itemToRemove.id);
+          this.quantity--;
+          this.total -= bagItem.price;
+        }
+      }
     }
   }));
 });
 
-
 //konversi ke rupiah
-
-const rupiah = (number) => {
+window.rupiah = (number) => {
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
     currency: "IDR",
     minimumFractionDigits: 0,
   }).format(number);
-}
+};
